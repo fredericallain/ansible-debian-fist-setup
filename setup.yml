@@ -39,7 +39,7 @@
         - fail2ban
 
     - name: give user sudo privilege
-      ansible.builtin.shell: 'echo "{{ { ansible_user } }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
+      ansible.builtin.shell: 'echo "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
 
     - name: add user visudo
       community.general.sudoers:
