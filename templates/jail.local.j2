@@ -1,0 +1,23 @@
+[sshd]
+enable = true
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+filter = sshd
+bantime = 1200
+
+[apache] 
+enabled = true 
+port = http,https 
+filter = apache-auth 
+logpath = /var/log/apache2/*error.log 
+maxretry = 3 
+bantime = 600 
+
+[apache-badbots] 
+enabled = true 
+port = http,https 
+filter = apache-badbots 
+logpath = /var/log/apache2/*error.log 
+maxretry = 3 
+bantime = 600 

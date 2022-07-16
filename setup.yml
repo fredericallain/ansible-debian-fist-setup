@@ -1,0 +1,93 @@
+- name: Install new server
+  hosts: newserver
+  become: true
+  gather_facts: true
+  order: sorted
+  tasks:
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: fallain
+        state: present
+        key: "{{ lookup('file', '{{ user_ssh_key }}') }}"
+    - name: Set same timezone on every Server
+      ansible.builtin.timezone:
+        name: "{{ system_timezone }}"
+      when: (system_timezone is defined) and (system_timezone != "Your/Timezone")
+
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      ansible.builtin.apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Upgrade all packages on servers
+      ansible.builtin.apt: upgrade=dist force_apt_get=yes
+
+    - name: Install base package
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      with_items:
+        - curl
+        - git
+        - wget
+        - htop
+        - sudo
+        - qemu-guest-agent
+        - clamav
+        - ufw
+        - gnupg2
+        - fail2ban
+
+    - name: give user sudo privilege
+      ansible.builtin.shell: 'echo "{{ { ansible_user } }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
+
+    - name: add user visudo
+      community.general.sudoers:
+        name: '{{ ansible_user }}_as_root'
+        state: present
+        user: bob
+        runas: root
+        commands: ALL
+
+    - name: Configure issue
+      ansible.builtin.template:
+        src: "issue.j2"
+        dest: "/etc/issue"
+        owner: root
+        group: root
+
+    - name: Configure issue.net
+      ansible.builtin.template:
+        src: "issue.net.j2"
+        dest: "/etc/issue.net"
+        owner: root
+        group: root
+
+    - name: Configure sshd_config
+      ansible.builtin.template:
+        src: "sshd_config.j2"
+        dest: "/etc/ssh/sshd_config"
+        owner: root
+        group: root
+
+    - name: Restart services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - fail2ban
+        - sshd
+
+    - name: autoremove all old packages on serveur
+      ansible.builtin.apt:
+        autoremove: true
+        purge: true
+
+    - name: Check if reboot required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+
+    - name: Reboot if required
+      ansible.builtin.reboot:
+      when: reboot_required_file.stat.exists == true

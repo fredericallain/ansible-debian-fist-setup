@@ -1,0 +1,9 @@
+---
+ansible_user: <USERNAME>
+ansible_email: <MAIL@DOMAIN.TLD>
+systemd_dir: /etc/systemd/system
+
+system_timezone: "Europe/Paris"
+
+user_ssh_key: </PATH/TO/SSH-KEY.pub>
+
