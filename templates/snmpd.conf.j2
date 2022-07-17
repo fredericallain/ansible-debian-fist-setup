@@ -1,0 +1,5 @@
+syslocation {{ snmp_location }}
+sysContact {{ snmp_username }} <{{ snmp_email }}>
+createUser {{ snmp_username }} SHA {{ snmp_password }} AES {{ snmp_enryption }}
+rouser {{ snmp_username }} authPriv
+

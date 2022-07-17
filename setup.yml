@@ -37,6 +37,7 @@
         - ufw
         - gnupg2
         - fail2ban
+        - snmpd
 
     - name: give user sudo privilege
       ansible.builtin.shell: 'echo "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
@@ -69,6 +70,13 @@
         dest: "/etc/ssh/sshd_config"
         owner: root
         group: root
+    
+    - name: Configure snmp
+      ansible.builtin.template:
+        src: "snmpd.conf.j2"
+        dest: "/etc/snmp/snmpd.conf"
+        owner: root
+        group: root
 
     - name: Restart services
       ansible.builtin.service:
@@ -77,6 +85,7 @@
       with_items:
         - fail2ban
         - sshd
+        - snmpd
 
     - name: autoremove all old packages on serveur
       ansible.builtin.apt:
