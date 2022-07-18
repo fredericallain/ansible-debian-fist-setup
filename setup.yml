@@ -38,6 +38,7 @@
         - gnupg2
         - fail2ban
         - snmpd
+        - inotify-tools
 
     - name: give user sudo privilege
       ansible.builtin.shell: 'echo "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
@@ -86,6 +87,19 @@
         - fail2ban
         - sshd
         - snmpd
+
+    - name: Download Linux Malware Detect
+      ansible.builtin.unarchive:
+        src: http://www.rfxn.com/downloads/maldetect-current.tar.gz
+        dest: /tmp/
+        remote_src: yes
+        owner: root
+        group: root
+
+    - name: Install LMD
+      ansible.builtin.command:
+        chdir: /tmp/maldetect-1.6.4/
+        cmd: ./install.sh
 
     - name: autoremove all old packages on serveur
       ansible.builtin.apt:
