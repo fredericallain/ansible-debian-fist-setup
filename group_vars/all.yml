@@ -7,3 +7,9 @@ system_timezone: "Europe/Paris"
 
 user_ssh_key: </PATH/TO/SSH-KEY.pub>
 
+snmp_location: <LOCATION>
+snmp_email: <MAIL@DOMAIN.TLD>
+snmp_username: <USERNAME>
+snmp_password: "<STRONG_PASSWORD>"
+snmp_enryption: "<STRONG_PASSPHRASE>"
+
