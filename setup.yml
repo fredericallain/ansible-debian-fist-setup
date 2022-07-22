@@ -6,13 +6,13 @@
   tasks:
     - name: Set authorized key taken from file
       ansible.posix.authorized_key:
-        user: fallain
+        user: "{{ ansible_user }}"
         state: present
         key: "{{ lookup('file', '{{ user_ssh_key }}') }}"
+
     - name: Set same timezone on every Server
       ansible.builtin.timezone:
         name: "{{ system_timezone }}"
-      when: (system_timezone is defined) and (system_timezone != "Your/Timezone")
 
     - name: Update apt repo and cache on all Debian/Ubuntu boxes
       ansible.builtin.apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
@@ -42,14 +42,6 @@
 
     - name: give user sudo privilege
       ansible.builtin.shell: 'echo "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/{{ ansible_user }}'
-
-    - name: add user visudo
-      community.general.sudoers:
-        name: '{{ ansible_user }}_as_root'
-        state: present
-        user: bob
-        runas: root
-        commands: ALL
 
     - name: Configure issue
       ansible.builtin.template:
